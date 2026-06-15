@@ -1,0 +1,342 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TOSS REPORT™ 👑</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; width: 100%; overflow: hidden; font-family: 'Manrope', sans-serif; }
+
+    /* Cricket stadium bg */
+    .bg-img {
+      position: fixed; inset: 0; z-index: 0;
+      background-image: url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1600&q=80&fit=crop');
+      background-size: cover;
+      background-position: center 30%;
+    }
+    .bg-img::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(170deg,
+        rgba(26,13,0,0.7) 0%,
+        rgba(51,26,0,0.5) 45%,
+        rgba(26,13,0,0.75) 100%
+      );
+    }
+
+    /* Pitch oval overlay */
+    .pitch-oval {
+      position: fixed;
+      width: 600px; height: 600px;
+      border: 1px solid rgba(251,191,36,0.04);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 1;
+    }
+    .pitch-oval:nth-child(2) {
+      width: 400px; height: 400px;
+      border-color: rgba(251,191,36,0.06);
+    }
+
+    /* Ticker */
+    .ticker {
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid #fbbf24;
+      overflow: hidden; white-space: nowrap;
+      position: relative; z-index: 20;
+    }
+    .ticker-inner { display: inline-block; animation: tick 22s linear infinite; }
+    @keyframes tick { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* ── NEW LAYOUT: Split diagonal card ── */
+    .main-wrap {
+      position: relative; z-index: 10;
+      width: 100%; max-width: 400px;
+    }
+
+    /* Diagonal slash behind headline */
+    .slash-bg {
+      position: absolute;
+      top: -20px; left: -30px; right: -30px;
+      height: 160px;
+      background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(168,85,247,0.04));
+      transform: skewY(-4deg);
+      border-radius: 12px;
+      pointer-events: none;
+    }
+
+    /* Score board style top strip */
+    .scoreboard {
+      background: linear-gradient(90deg, #78350f, #d97706, #78350f);
+      border: 1px solid rgba(251,191,36,0.3);
+      border-radius: 12px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .score-item { text-align: center; }
+    .score-num {
+      font-family: 'Teko', sans-serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: #fde68a; line-height: 1;
+    }
+    .score-label { font-size: 8px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 1px; }
+    .score-divider { width: 1px; height: 30px; background: rgba(251,191,36,0.2); }
+
+    /* Ball spin icon */
+    .ball-wrap {
+      position: relative;
+      width: 80px; height: 80px;
+    }
+    .cricket-ball {
+      width: 64px; height: 64px;
+      background: radial-gradient(circle at 38% 35%, #cc2200, #8b0000);
+      border-radius: 50%;
+      box-shadow: 0 0 28px rgba(200,34,0,0.45), inset -4px -4px 10px rgba(0,0,0,0.4);
+      animation: ballspin 6s linear infinite;
+      position: relative;
+    }
+    .cricket-ball::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: -5px; right: -5px; height: 2px;
+      background: rgba(255,200,180,0.5);
+      transform: translateY(-50%);
+      border-radius: 99px;
+    }
+    .cricket-ball::after {
+      content: '';
+      position: absolute;
+      top: 28%; left: 50%; width: 2px;
+      height: 44%;
+      background: rgba(255,200,180,0.4);
+      transform: translateX(-50%);
+      border-radius: 99px;
+    }
+    @keyframes ballspin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Glow ring around ball */
+    .ball-ring {
+      position: absolute; inset: -8px;
+      border-radius: 50%;
+      border: 1px solid rgba(168,85,247,0.3);
+      animation: ringpulse 2s ease-in-out infinite;
+    }
+    @keyframes ringpulse {
+      0%,100% { transform: scale(1); opacity: 0.4; }
+      50%      { transform: scale(1.15); opacity: 0.8; }
+    }
+
+    /* Headline */
+    .hl { font-family: 'Teko', sans-serif; line-height: 0.88; }
+
+    /* Glass panel */
+    .glass {
+      background: rgba(28, 14, 0, 0.6);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(251,191,36,0.18);
+      border-radius: 20px;
+      box-shadow: 0 12px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(251,191,36,0.1);
+    }
+
+    /* CTA — full width green */
+    .cta {
+      background: linear-gradient(90deg, #d97706, #fbbf24, #d97706);
+      background-size: 200% 100%;
+      color: #ffffff;
+      font-family: 'Teko', sans-serif;
+      font-size: 1.1rem; font-weight: 600;
+      letter-spacing: 0.12em;
+      animation: ctaslide 3s linear infinite;
+      transition: transform .18s, box-shadow .18s;
+      position: relative; overflow: hidden;
+    }
+    @keyframes ctaslide {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    .cta::after {
+      content: '';
+      position: absolute; top:0; left:-100%; width:50%; height:100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: skewX(-18deg);
+      animation: shine 3s ease-in-out infinite;
+    }
+    @keyframes shine { 0%,65%{left:-100%} 100%{left:160%} }
+    .cta:hover { transform: scale(1.03); box-shadow: 0 0 36px rgba(251,191,36,0.6); }
+
+    .ghost {
+      border: 1px solid rgba(251,191,36,0.3);
+      color: rgba(251,191,36,0.75);
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(6px);
+      font-family: 'Manrope', sans-serif;
+      transition: all .2s;
+    }
+    .ghost:hover { border-color: #fbbf24; color: #fbbf24; background: rgba(251,191,36,0.07); }
+
+    /* Pill */
+    .pill {
+      background: rgba(251,191,36,0.09);
+      border: 1px solid rgba(251,191,36,0.22);
+      color: rgba(251,191,36,0.8);
+    }
+
+    @keyframes ping { 75%,100%{transform:scale(2.2);opacity:0} }
+    .ping { animation: ping 1.3s cubic-bezier(0,0,.2,1) infinite; }
+
+    /* Stump line decoration */
+    .stumps {
+      display: flex; align-items: flex-end; gap: 4px;
+      opacity: 0.5;
+    }
+    .stump { width: 3px; border-radius: 2px; background: rgba(255,220,150,0.6); }
+  </style>
+</head>
+<body class="flex flex-col h-screen relative">
+
+  <div class="bg-img"></div>
+  <div class="pitch-oval"></div>
+  <div class="pitch-oval" style="width:400px;height:400px;"></div>
+
+  <!-- TICKER -->
+  <div class="ticker py-1.5 flex-shrink-0">
+    <div class="ticker-inner text-[11px] font-bold tracking-widest" style="color:#fbbf24;">
+      <span class="px-5">🏏 TOSS REPORT™ •</span>
+      <span class="px-5">IPL  •</span>
+      <span class="px-5">T20 PICKS •</span>
+      <span class="px-5">TEST MATCH ANALYSIS •</span>
+      <span class="px-5">FREE TO JOIN •</span>
+      <span class="px-5">LIVE MATCH ALERTS •</span>
+      <span class="px-5">ODI & T20I COVERAGE •</span>
+      <span class="px-5">🏏 TOSS REPORT™ •</span>
+      <span class="px-5">IPL  •</span>
+      <span class="px-5">T20 PICKS •</span>
+      <span class="px-5">TEST MATCH ANALYSIS •</span>
+      <span class="px-5">FREE TO JOIN •</span>
+      <span class="px-5">LIVE MATCH ALERTS •</span>
+      <span class="px-5">ODI & T20I COVERAGE •</span>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col items-center justify-center px-4 relative z-10">
+    <div class="main-wrap">
+      <div class="glass px-6 py-5 flex flex-col gap-4">
+
+        <!-- TOP ROW: ball + headline side by side -->
+        <div class="flex items-center gap-5">
+          <div class="ball-wrap flex-shrink-0">
+            <img src="profile.jpg" class="rounded-md w-full h-full object-cover" alt="">
+            <!-- <div class="cricket-ball"></div>
+            <div class="ball-ring"></div> -->
+          </div>
+          <div>
+            <p style="font-size:10px;color:rgba(251,191,36,0.5);letter-spacing:0.28em;text-transform:uppercase;margin-bottom:4px;">Telegram Channel</p>
+            <div class="hl">
+              <div style="font-size:clamp(1.4rem,7vw,2.4rem); line-height: 1.1;">
+                <span style="color:#fffbeb;text-shadow:0 0 30px rgba(251,191,36,0.2);">RAJ</span>
+                <span style="background:linear-gradient(135deg,#d97706,#fbbf24,#d97706);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">( TOSS KING )™</span>
+              </div>
+              <div style="font-size:clamp(1.4rem,6vw,2.4rem);color:rgba(255,255,255,0.35);letter-spacing:0.15em;">— 👑 —</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCOREBOARD -->
+        <div class="scoreboard">
+          <div class="score-item">
+            <div class="score-num">IPL</div>
+            <div class="score-label">Coverage</div>
+          </div>
+          <div class="score-divider"></div>
+          <div class="score-item">
+            <div class="score-num">T20</div>
+            <div class="score-label">Picks</div>
+          </div>
+          <div class="score-divider"></div>
+          <div class="score-item">
+            <div class="score-num">ODI</div>
+            <div class="score-label">Analysis</div>
+          </div>
+          <div class="score-divider"></div>
+          <div class="score-item">
+            <div class="score-num" style="color:#ffeb3b;">FREE</div>
+            <div class="score-label">To Join</div>
+          </div>
+        </div>
+
+        <!-- Subtext -->
+        <p style="color:rgba(255,255,255,0.4);font-size:0.78rem;line-height:1.65;font-weight:300;text-align:center;">
+          Expert cricket predictions — IPL, T20, ODI &amp; Test. Match tips, player form &amp; live alerts, every day.
+        </p>
+
+        <!-- Pills -->
+        <div class="flex flex-wrap justify-center gap-2">
+          <span class="pill text-xs px-3 py-1 rounded-full">🏏 Match Picks</span>
+          <span class="pill text-xs px-3 py-1 rounded-full">📊 Player Form</span>
+          <span class="pill text-xs px-3 py-1 rounded-full">⚡ Live Alerts</span>
+          <span class="pill text-xs px-3 py-1 rounded-full">🏆 Tournament Tips</span>
+        </div>
+
+        <!-- CTA full width -->
+        <a href="https://telegram.me/+c3CQbtyHpFdjZGE1" target="_blank"
+           class="cta flex items-center justify-center gap-2 w-full py-3.5 rounded-xl shadow-2xl text-decoration-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+          </svg>
+          JOIN FREE ON TELEGRAM
+        </a>
+
+        <!-- Bottom row -->
+        <div class="flex items-center justify-between">
+          <!-- Stumps decoration -->
+          <div class="stumps">
+            <div class="stump" style="height:22px;"></div>
+            <div class="stump" style="height:24px;"></div>
+            <div class="stump" style="height:22px;"></div>
+            <div class="stump" style="height:6px;width:14px;border-radius:2px;background:rgba(255,220,150,0.4);margin-left:1px;"></div>
+          </div>
+
+          <!-- Live dot -->
+          <div class="flex items-center gap-2">
+            <span class="relative flex h-2 w-2">
+              <span class="ping absolute inline-flex h-full w-full rounded-full" style="background:#fbbf24;opacity:0.75;"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full" style="background:#fbbf24;"></span>
+            </span>
+            <span style="color:rgba(255,255,255,0.28);font-size:0.68rem;">Members active now</span>
+           </div>
+          <!-- Stumps mirror -->
+          <div class="stumps" style="transform:scaleX(-1);">
+            <div class="stump" style="height:22px;"></div>
+            <div class="stump" style="height:24px;"></div>
+            <div class="stump" style="height:22px;"></div>
+            <div class="stump" style="height:6px;width:14px;border-radius:2px;background:rgba(255,220,150,0.4);margin-left:1px;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="text-center py-2 flex-shrink-0 relative z-10">
+    <p style="color:rgb(255, 255, 255);font-size:10px;">Free forever · Please bet responsibly · TOSS REPORT™</p>
+    <p style="color:rgb(255, 255, 255);font-size:10px;margin-top:4px;">
+      <a href="https://t.me/adsrankmedia" target="white" style="text-decoration:none;color:inherit;opacity:0.8;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">advertise by adsrankmedia</a>
+    </p>
+  </div>
+
+</body>
+</html>
